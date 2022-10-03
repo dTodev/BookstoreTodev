@@ -18,5 +18,6 @@ namespace Bookstore.BL.Interfaces
         Author? GetById(int id);
         Author GetAuthorByName(string name);
         UpdateAuthorResponse UpdateAuthor(UpdateAuthorRequest user);
+        bool AddMultipleAuthors(IEnumerable<Author> authorCollection);
     }
 }

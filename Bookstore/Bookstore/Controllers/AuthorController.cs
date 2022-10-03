@@ -1,4 +1,5 @@
 using System.Net;
+using AutoMapper;
 using Bookstore.BL.Interfaces;
 using Bookstore.BL.Services;
 using Bookstore.DL.Interfaces;
@@ -15,22 +16,37 @@ namespace Bookstore.Controllers
     {
         private readonly IAuthorService _authorService;
         private readonly ILogger<AuthorController> _logger;
+        private readonly IMapper _mapper;
 
-        public AuthorController(ILogger<AuthorController> logger, IAuthorService authorService)
+        public AuthorController(ILogger<AuthorController> logger, IAuthorService authorService, IMapper mapper)
         {
             _logger = logger;
             _authorService = authorService;
+            _mapper = mapper;   
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet(nameof(GetAllAuthors))]
         public IActionResult GetAllAuthors()
         {
-            _logger.LogInformation("Information Test");
-            _logger.LogWarning("Warning Test");
-            _logger.LogError("Error Test");
-            _logger.LogCritical("Critical Test");
             return Ok(_authorService.GetAllAuthors());
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpPost(nameof(AddAuthorRange))]
+        public IActionResult AddAuthorRange([FromBody] AddMultipleAuthorsRequest addMultipleAuthorRequests)
+        {
+            if (addMultipleAuthorRequests != null && !addMultipleAuthorRequests.AuthorRequests.Any())
+                    return BadRequest(addMultipleAuthorRequests);
+
+            var authorCollection = _mapper.Map<IEnumerable<Author>>(addMultipleAuthorRequests.AuthorRequests);
+
+            var result = _authorService.AddMultipleAuthors(authorCollection);
+
+            if(!result) return BadRequest(result);
+
+            return Ok(result);
         }
 
         [HttpGet(nameof(GetById))]

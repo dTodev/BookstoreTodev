@@ -98,5 +98,10 @@ namespace Bookstore.BL.Services
                 Name = result
             };
         }
+
+        bool IAuthorService.AddMultipleAuthors(IEnumerable<Author> authorCollection)
+        {
+            return _authorRepository.AddMultipleAuthors(authorCollection);
+        }
     }
 }

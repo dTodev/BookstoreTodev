@@ -12,5 +12,6 @@ namespace Bookstore.Models
         Author? GetById(int id);
         Author GetAuthorByName(string name);
         Author UpdateAuthor(Author user);
+        public bool AddMultipleAuthors(IEnumerable<Author> authorCollection);
     }
 }
