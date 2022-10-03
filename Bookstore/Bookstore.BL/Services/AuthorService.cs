@@ -12,36 +12,31 @@ namespace Bookstore.BL.Services
 {
     public class AuthorService : IAuthorService
     {
-        private readonly IAuthorRepository _authorService;
+        private readonly IAuthorRepository _authorRepository;
 
         public AuthorService(IAuthorRepository authorRepository)
         {
-            _authorService = authorRepository;
+            _authorRepository = authorRepository;
         }
 
         public IEnumerable<Author> GetAllAuthors()
         {
-            return _authorService.GetAllAuthors();
+            return _authorRepository.GetAllAuthors();
         }
 
         public Author? AddAuthor(Author author)
         {
-            return _authorService.AddAuthor(author);
+            return _authorRepository.AddAuthor(author);
         }
 
         public Author DeleteAuthor(int authorId)
         {
-            return _authorService.DeleteAuthor(authorId);
+            return _authorRepository.DeleteAuthor(authorId);
         }
 
         public Author? GetById(int id)
         {
-            return _authorService.GetById(id);
-        }
-
-        public Guid GetGuidId()
-        {
-            return Guid.NewGuid();
+            return _authorRepository.GetById(id);
         }
 
         public Author UpdateAuthor(Author author)

@@ -19,25 +19,16 @@ namespace Bookstore.Controllers
             this.PersonService = personService;
         }
 
-        [HttpGet(nameof(GetGuid))]
-        public Guid GetGuid()
-        {
-            return PersonService.GetGuidId();
-
-        }
-
         [HttpGet(nameof(Get))]
         public IEnumerable<Person> Get()
         {
             return PersonService.GetAllUsers();
-
         }
 
         [HttpGet(nameof(GetById))]
         public Person GetById(int id)
         {
             return PersonService.GetById(id);
-
         }
 
         [HttpPost(nameof(AddUser))]
@@ -53,8 +44,5 @@ namespace Bookstore.Controllers
             PersonService.UpdateUser(user);
             return user;
         }
-
-        
-
     }
 }

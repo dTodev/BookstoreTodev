@@ -11,31 +11,31 @@ namespace Bookstore.BL.Services
 {
     public class BookService : IBookService
     {
-        private readonly IBookRepository _bookService;
+        private readonly IBookRepository _bookRepository;
 
         public BookService(IBookRepository bookRepository)
         {
-            _bookService = bookRepository;
+            _bookRepository = bookRepository;
         }
 
         public IEnumerable<Book> GetAllBooks()
         {
-            return _bookService.GetAllBooks();
+            return _bookRepository.GetAllBooks();
         }
 
         public Book? AddBook(Book book)
         {
-            return _bookService.AddBook(book);
+            return _bookRepository.AddBook(book);
         }
 
         public Book DeleteBook(int bookId)
         {
-            return _bookService.DeleteBook(bookId);
+            return _bookRepository.DeleteBook(bookId);
         }
         
         public Book? GetById(int id)
         {
-            return _bookService.GetById(id);
+            return _bookRepository.GetById(id);
         }
 
         public Guid GetGuidId()

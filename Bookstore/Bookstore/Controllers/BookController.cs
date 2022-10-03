@@ -20,25 +20,16 @@ namespace Bookstore.Controllers
             this.BookService = bookService;
         }
 
-        [HttpGet(nameof(GetGuid))]
-        public Guid GetGuid()
-        {
-            return BookService.GetGuidId();
-
-        }
-
         [HttpGet(nameof(Get))]
         public IEnumerable<Book> Get()
         {
             return BookService.GetAllBooks();
-
         }
 
         [HttpGet(nameof(GetById))]
         public Book GetById(int id)
         {
             return BookService.GetById(id);
-
         }
 
         [HttpPost(nameof(AddBook))]
@@ -54,8 +45,5 @@ namespace Bookstore.Controllers
             BookService.UpdateBook(book);
             return book;
         }
-
-        
-
     }
 }

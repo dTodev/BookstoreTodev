@@ -79,12 +79,5 @@ namespace Bookstore.DL.Repositories.InMemoryRepositories
 
             return user;
         }
-
-        public Guid GetGuidId()
-        {
-            return Id;
-        }
-
-        
     }
 }

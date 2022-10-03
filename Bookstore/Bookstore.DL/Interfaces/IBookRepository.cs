@@ -9,6 +9,5 @@ namespace Bookstore.DL.Interfaces
         IEnumerable<Book> GetAllBooks();
         Book? GetById(int id);
         Book UpdateBook(Book book);
-        Guid GetGuidId();
     }
 }

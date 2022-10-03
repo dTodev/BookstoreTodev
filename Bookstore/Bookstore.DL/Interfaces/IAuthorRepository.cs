@@ -9,6 +9,5 @@ namespace Bookstore.Models
         IEnumerable<Author> GetAllAuthors();
         Author? GetById(int id);
         Author UpdateAuthor(Author user);
-        Guid GetGuidId();
     }
 }

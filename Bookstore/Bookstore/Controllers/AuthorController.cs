@@ -1,3 +1,4 @@
+using Bookstore.BL.Interfaces;
 using Bookstore.DL.Interfaces;
 using Bookstore.DL.Repositories.InMemoryRepositories;
 using Bookstore.Models;
@@ -10,34 +11,25 @@ namespace Bookstore.Controllers
     [Route("[controller]")]
     public class AuthorController : ControllerBase
     {
-        private readonly IAuthorRepository authorInMemoryRepository;
+        private readonly IAuthorService authorInMemoryRepository;
         private readonly ILogger<AuthorController> _logger;
 
-        public AuthorController(ILogger<AuthorController> logger, IAuthorRepository authorInMemoryRepository)
+        public AuthorController(ILogger<AuthorController> logger, IAuthorService authorInMemoryRepository)
         {
             _logger = logger;
             this.authorInMemoryRepository = authorInMemoryRepository;
-        }
-
-        [HttpGet(nameof(GetGuid))]
-        public Guid GetGuid()
-        {
-            return authorInMemoryRepository.GetGuidId();
-
         }
 
         [HttpGet(nameof(Get))]
         public IEnumerable<Author> Get()
         {
             return authorInMemoryRepository.GetAllAuthors();
-
         }
 
         [HttpGet(nameof(GetById))]
         public Author GetById(int id)
         {
             return authorInMemoryRepository.GetById(id);
-
         }
 
         [HttpPost(nameof(AddAuthor))]
@@ -53,7 +45,5 @@ namespace Bookstore.Controllers
             authorInMemoryRepository.UpdateAuthor(author);
             return author;
         }
-
-
     }
 }
