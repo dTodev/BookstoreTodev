@@ -1,9 +1,11 @@
 ﻿using Bookstore.DL.Interfaces;
 using Bookstore.Models;
+using Bookstore.Models.Models;
+using Bookstore.Models.Responses;
 
 namespace Bookstore.DL.Repositories.InMemoryRepositories
 {
-    public class AuthorInMemoryRepository : IAuthorRepository
+    public class AuthorRepository : IAuthorRepository
     {
 
         private static List<Author> _authors = new List<Author>()
@@ -30,7 +32,7 @@ namespace Bookstore.DL.Repositories.InMemoryRepositories
 
         public Guid Id { get; set; }
 
-        public AuthorInMemoryRepository()
+        public AuthorRepository()
         {
             Id = Guid.NewGuid();
         }
@@ -43,6 +45,11 @@ namespace Bookstore.DL.Repositories.InMemoryRepositories
         public Author? GetById(int id)
         {
             return _authors.FirstOrDefault(x => x.Id == id);
+        }
+
+        public Author? GetAuthorByName(string name)
+        {
+            return _authors.FirstOrDefault(x => x.Name == name);
         }
 
         public Author? AddAuthor(Author user)
@@ -61,7 +68,7 @@ namespace Bookstore.DL.Repositories.InMemoryRepositories
 
         public Author UpdateAuthor(Author user)
         {
-            var existingUser = _authors.FirstOrDefault(x => x.Id == user.Id);
+            var existingUser = _authors.FirstOrDefault(x => x.Name == user.Name);
 
             if (existingUser == null) return null;
             _authors.Remove(existingUser);
@@ -84,7 +91,5 @@ namespace Bookstore.DL.Repositories.InMemoryRepositories
         {
             return Id;
         }
-
-        
     }
 }
