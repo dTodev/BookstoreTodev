@@ -1,8 +1,10 @@
+using System.Net;
 using Bookstore.BL.Interfaces;
 using Bookstore.BL.Services;
 using Bookstore.DL.Interfaces;
 using Bookstore.DL.Repositories.InMemoryRepositories;
 using Bookstore.Models.Models;
+using Bookstore.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bookstore.Controllers
@@ -11,39 +13,51 @@ namespace Bookstore.Controllers
     [Route("[controller]")]
     public class BookController : ControllerBase
     {
-        private readonly IBookService BookService;
+        private readonly IBookService _bookService;
         private readonly ILogger<BookController> _logger;
 
         public BookController(ILogger<BookController> logger, IBookService bookService)
         {
             _logger = logger;
-            this.BookService = bookService;
+            this._bookService = bookService;
         }
 
-        [HttpGet(nameof(Get))]
-        public IEnumerable<Book> Get()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet(nameof(GetAllBooks))]
+        public IActionResult GetAllBooks()
         {
-            return BookService.GetAllBooks();
+            return Ok(_bookService.GetAllBooks());
         }
 
         [HttpGet(nameof(GetById))]
         public Book GetById(int id)
         {
-            return BookService.GetById(id);
+            return _bookService.GetById(id);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost(nameof(AddBook))]
-        public Book AddBook(Book book)
+        public IActionResult AddBook([FromBody] AddBookRequest bookRequest)
         {
-            BookService.AddBook(book);
-            return book;
+            var result = _bookService.AddBook(bookRequest);
+
+            if (result.HttpStatusCode == HttpStatusCode.BadRequest)
+                return BadRequest(result);
+
+            return Ok(result);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost(nameof(UpdateBook))]
-        public Book UpdateBook(Book book)
+        public IActionResult UpdateBook([FromBody] UpdateBookRequest bookRequest)
         {
-            BookService.UpdateBook(book);
-            return book;
+            var result = _bookService.UpdateBook(bookRequest);
+
+            if (result.HttpStatusCode == HttpStatusCode.BadRequest)
+                return BadRequest(result);
+            return Ok(result);
         }
     }
 }

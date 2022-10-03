@@ -3,7 +3,7 @@ using Bookstore.Models.Models;
 
 namespace Bookstore.DL.Repositories.InMemoryRepositories
 {
-    public class BookInMemoryRepository : IBookRepository
+    public class BookRepository : IBookRepository
     {
 
         private static List<Book> _books = new List<Book>()
@@ -30,7 +30,7 @@ namespace Bookstore.DL.Repositories.InMemoryRepositories
 
         public Guid Id { get; set; }
 
-        public BookInMemoryRepository()
+        public BookRepository()
         {
             Id = Guid.NewGuid();
         }
@@ -43,6 +43,11 @@ namespace Bookstore.DL.Repositories.InMemoryRepositories
         public Book? GetById(int id)
         {
             return _books.FirstOrDefault(x => x.Id == id);
+        }
+
+        public Book? GetBookByName(string name)
+        {
+            return _books.FirstOrDefault(x => x.Title == name);
         }
 
         public Book? AddBook(Book book)
@@ -61,7 +66,7 @@ namespace Bookstore.DL.Repositories.InMemoryRepositories
 
         public Book UpdateBook(Book book)
         {
-            var existingBook = _books.FirstOrDefault(x => x.Id == book.Id);
+            var existingBook = _books.FirstOrDefault(x => x.Title == book.Title);
 
             if (existingBook == null) return null;
             _books.Remove(existingBook);

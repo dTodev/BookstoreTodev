@@ -8,6 +8,7 @@ namespace Bookstore.DL.Interfaces
         Book DeleteBook(int bookId);
         IEnumerable<Book> GetAllBooks();
         Book? GetById(int id);
+        Book GetBookByName(string name);
         Book UpdateBook(Book book);
     }
 }
