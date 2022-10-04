@@ -6,6 +6,7 @@ using Bookstore.DL.Interfaces;
 using Bookstore.DL.Repositories.InMemoryRepositories;
 using Bookstore.Models.Models;
 using Bookstore.Models.Requests;
+using Bookstore.Models.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bookstore.Controllers
@@ -27,43 +28,49 @@ namespace Bookstore.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet(nameof(GetAllAuthors))]
-        public IActionResult GetAllAuthors()
+        public async Task<IActionResult> GetAllAuthors()
         {
-            return Ok(_authorService.GetAllAuthors());
+            return Ok(await _authorService.GetAllAuthors());
+        }
+
+        [HttpGet(nameof(GetById))]
+        public async Task<Author> GetById(int id)
+        {
+            return await _authorService.GetById(id);
+        }
+
+        [HttpGet(nameof(GetAuthorByName))]
+        public async Task<Author> GetAuthorByName(string name)
+        {
+            return await _authorService.GetAuthorByName(name);
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpPost(nameof(AddAuthor))]
+        public async Task<IActionResult> AddAuthor([FromBody] AddAuthorRequest authorRequest)
+        {
+            var result = await _authorService.AddAuthor(authorRequest);
+
+            if (result.HttpStatusCode == HttpStatusCode.BadRequest)
+                return BadRequest(result);
+
+            return Ok(result);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost(nameof(AddAuthorRange))]
-        public IActionResult AddAuthorRange([FromBody] AddMultipleAuthorsRequest addMultipleAuthorRequests)
+        public async Task <IActionResult> AddAuthorRange([FromBody] AddMultipleAuthorsRequest addMultipleAuthorRequests)
         {
             if (addMultipleAuthorRequests != null && !addMultipleAuthorRequests.AuthorRequests.Any())
                     return BadRequest(addMultipleAuthorRequests);
 
             var authorCollection = _mapper.Map<IEnumerable<Author>>(addMultipleAuthorRequests.AuthorRequests);
 
-            var result = _authorService.AddMultipleAuthors(authorCollection);
+            var result = await _authorService.AddMultipleAuthors(authorCollection);
 
             if(!result) return BadRequest(result);
-
-            return Ok(result);
-        }
-
-        [HttpGet(nameof(GetById))]
-        public Author GetById(int id)
-        {
-            return _authorService.GetById(id);
-        }
-
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [HttpPost(nameof(AddAuthor))]
-        public IActionResult AddAuthor([FromBody] AddAuthorRequest authorRequest)
-        {
-            var result = _authorService.AddAuthor(authorRequest);
-
-            if (result.HttpStatusCode == HttpStatusCode.BadRequest)
-                return BadRequest(result);
 
             return Ok(result);
         }
@@ -71,13 +78,19 @@ namespace Bookstore.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost(nameof(UpdateAuthor))]
-        public IActionResult UpdateAuthor([FromBody] UpdateAuthorRequest authorRequest)
+        public async Task <IActionResult> UpdateAuthor([FromBody] UpdateAuthorRequest authorRequest)
         {
-            var result = _authorService.UpdateAuthor(authorRequest);
+            var result = await _authorService.UpdateAuthor(authorRequest);
 
             if (result.HttpStatusCode == HttpStatusCode.BadRequest)
                 return BadRequest(result);
             return Ok(result);
+        }
+
+        [HttpPost(nameof(DeleteAuthor))]
+        public async Task<UpdateAuthorResponse> DeleteAuthor(int Id)
+        {
+            return await _authorService.DeleteAuthor(Id);
         }
     }
 }

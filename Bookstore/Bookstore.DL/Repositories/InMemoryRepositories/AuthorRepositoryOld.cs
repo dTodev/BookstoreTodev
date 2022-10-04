@@ -6,12 +6,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Bookstore.DL.Repositories.InMemoryRepositories
 {
-    public class AuthorRepository : IAuthorRepository
+    public class AuthorRepositoryOld //: IAuthorRepository
     {
 
-        private readonly ILogger<AuthorRepository> _logger;
+        private readonly ILogger<AuthorRepositoryOld> _logger;
 
-        public AuthorRepository(ILogger<AuthorRepository> logger)
+        public AuthorRepositoryOld(ILogger<AuthorRepositoryOld> logger)
         {
             _logger = logger;
         }
@@ -40,7 +40,7 @@ namespace Bookstore.DL.Repositories.InMemoryRepositories
 
         public Guid Id { get; set; }
 
-        public AuthorRepository()
+        public AuthorRepositoryOld()
         {
             Id = Guid.NewGuid();
         }
@@ -109,7 +109,7 @@ namespace Bookstore.DL.Repositories.InMemoryRepositories
             }
             catch (Exception e)
             {
-                _logger.LogWarning($"Unable to add multiple authors with Message:{e.Message}");
+                _logger.LogWarning($"Unable to add multiple authors with:{e.Message}");
                 return false;
             }
         }
