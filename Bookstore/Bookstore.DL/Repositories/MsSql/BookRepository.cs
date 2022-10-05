@@ -31,7 +31,7 @@ namespace Bookstore.DL.Repositories.MsSql
                 {
                     await conn.OpenAsync();
 
-                    var result = await conn.ExecuteAsync("INSERT INTO [Books] (Title, AuthorId, Quantity, Price) VALUES(@Title, @AuthorId, @Quantity, @Price)", book);
+                    var result = await conn.ExecuteAsync("INSERT INTO [Books] (AuthorId, Title, LastUpdated, Quantity, Price) VALUES(@AuthorId, @Title, GETDATE(), @Quantity, @Price)", book);
 
                     return book;
                 }

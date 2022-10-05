@@ -19,14 +19,16 @@ namespace Bookstore.BL.Services
     public class BookService : IBookService
     {
         private readonly IBookRepository _bookRepository;
+        private readonly IAuthorRepository _authorRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<AuthorService> _logger;
 
-        public BookService(IBookRepository bookRepository, IMapper mapper, ILogger<AuthorService> logger)
+        public BookService(IBookRepository bookRepository, IMapper mapper, ILogger<AuthorService> logger, IAuthorRepository authorRepository)
         {
             _bookRepository = bookRepository;
             _mapper = mapper;
             _logger = logger;
+            _authorRepository = authorRepository;
         }
 
         public async Task <IEnumerable<Book>> GetAllBooks()
@@ -37,6 +39,14 @@ namespace Bookstore.BL.Services
         public async Task <AddBookResponse> AddBook(AddBookRequest bookRequest)
         {
             var auth = await _bookRepository.GetBookByName(bookRequest.Title);
+            var authorExists = await _authorRepository.GetById(bookRequest.AuthorId);
+
+            if (authorExists == null)
+                return new AddBookResponse()
+                {
+                    HttpStatusCode = HttpStatusCode.BadRequest,
+                    Message = "Author with such ID does not exist, book can't be created."
+                };
 
             if (auth != null)
                 return new AddBookResponse()

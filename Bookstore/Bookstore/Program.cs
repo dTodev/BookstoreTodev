@@ -3,6 +3,7 @@ using Bookstore.BL.Services;
 using Bookstore.DL.Interfaces;
 using Bookstore.DL.Repositories.InMemoryRepositories;
 using Bookstore.Extensions;
+using Bookstore.HealthChecks;
 using Bookstore.Models;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -32,6 +33,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add Health Check
+builder.Services.AddHealthChecks()
+    .AddCheck<SqlHealthCheck>("SQL Server")
+    .AddCheck<MyCustomHealthCheck>("Custom Health Check")
+    .AddUrlGroup(new Uri("https://google.bg"), name: "Google Service");
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -46,5 +53,9 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+//app.MapHealthChecks("/health");
+
+app.RegisterHealthChecks();
 
 app.Run();
