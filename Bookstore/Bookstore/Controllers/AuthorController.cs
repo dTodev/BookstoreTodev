@@ -33,10 +33,19 @@ namespace Bookstore.Controllers
             return Ok(await _authorService.GetAllAuthors());
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet(nameof(GetById))]
-        public async Task<Author> GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            return await _authorService.GetById(id);
+            var result = await _authorService.GetById(id);
+
+            if(result == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(await _authorService.GetById(id));
         }
 
         [HttpGet(nameof(GetAuthorByName))]
