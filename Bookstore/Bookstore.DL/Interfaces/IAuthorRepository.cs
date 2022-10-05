@@ -1,16 +1,15 @@
 ﻿using Bookstore.Models.Models;
-using Bookstore.Models.Requests;
-using Bookstore.Models.Responses;
 
 namespace Bookstore.Models
 {
     public interface IAuthorRepository
     {
-        Author AddAuthor(Author user);
-        Author DeleteAuthor(int userId);
-        IEnumerable<Author> GetAllAuthors();
-        Author? GetById(int id);
-        Author GetAuthorByName(string name);
-        Author UpdateAuthor(Author user);
+        public Task<Author> AddAuthor(Author user);
+        public Task<Author> DeleteAuthor(int userId);
+        public Task<IEnumerable<Author>> GetAllAuthors();
+        public Task<Author?> GetById(int id);
+        public Task<Author> GetAuthorByName(string name);
+        public Task<Author> UpdateAuthor(Author user);
+        public Task<bool> AddMultipleAuthors(IEnumerable<Author> authorCollection);
     }
 }

@@ -10,5 +10,7 @@ namespace Bookstore.Models.Requests
     {
         public string Title { get; init; }
         public int AuthorId { get; init; }
+        public int Quantity { get; init; }
+        public int Price { get; init; }
     }
 }

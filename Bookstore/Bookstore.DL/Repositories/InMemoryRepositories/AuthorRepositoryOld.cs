@@ -2,11 +2,19 @@
 using Bookstore.Models;
 using Bookstore.Models.Models;
 using Bookstore.Models.Responses;
+using Microsoft.Extensions.Logging;
 
 namespace Bookstore.DL.Repositories.InMemoryRepositories
 {
-    public class AuthorRepository : IAuthorRepository
+    public class AuthorRepositoryOld //: IAuthorRepository
     {
+
+        private readonly ILogger<AuthorRepositoryOld> _logger;
+
+        public AuthorRepositoryOld(ILogger<AuthorRepositoryOld> logger)
+        {
+            _logger = logger;
+        }
 
         private static List<Author> _authors = new List<Author>()
         {
@@ -32,7 +40,7 @@ namespace Bookstore.DL.Repositories.InMemoryRepositories
 
         public Guid Id { get; set; }
 
-        public AuthorRepository()
+        public AuthorRepositoryOld()
         {
             Id = Guid.NewGuid();
         }
@@ -90,6 +98,20 @@ namespace Bookstore.DL.Repositories.InMemoryRepositories
         public Guid GetGuidId()
         {
             return Id;
+        }
+
+        public bool AddMultipleAuthors(IEnumerable<Author> authorCollection)
+        {
+            try
+            {
+                _authors.AddRange(authorCollection);
+                return true;
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning($"Unable to add multiple authors with:{e.Message}");
+                return false;
+            }
         }
     }
 }

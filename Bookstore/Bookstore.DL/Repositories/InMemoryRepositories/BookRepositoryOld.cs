@@ -3,7 +3,7 @@ using Bookstore.Models.Models;
 
 namespace Bookstore.DL.Repositories.InMemoryRepositories
 {
-    public class BookRepository : IBookRepository
+    public class BookRepositoryOLD //: IBookRepository
     {
 
         private static List<Book> _books = new List<Book>()
@@ -30,7 +30,7 @@ namespace Bookstore.DL.Repositories.InMemoryRepositories
 
         public Guid Id { get; set; }
 
-        public BookRepository()
+        public BookRepositoryOLD()
         {
             Id = Guid.NewGuid();
         }

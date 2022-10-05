@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Bookstore.BL.Interfaces;
 using Bookstore.DL.Interfaces;
+using Bookstore.DL.Repositories.MsSql;
 using Bookstore.Models;
 using Bookstore.Models.Models;
 using Bookstore.Models.Requests;
 using Bookstore.Models.Responses;
+using Microsoft.Extensions.Logging;
 
 namespace Bookstore.BL.Services
 {
@@ -18,21 +20,23 @@ namespace Bookstore.BL.Services
     {
         private readonly IBookRepository _bookRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<AuthorService> _logger;
 
-        public BookService(IBookRepository bookRepository, IMapper mapper)
+        public BookService(IBookRepository bookRepository, IMapper mapper, ILogger<AuthorService> logger)
         {
             _bookRepository = bookRepository;
             _mapper = mapper;
+            _logger = logger;
         }
 
-        public IEnumerable<Book> GetAllBooks()
+        public async Task <IEnumerable<Book>> GetAllBooks()
         {
-            return _bookRepository.GetAllBooks();
+            return await _bookRepository.GetAllBooks();
         }
 
-        public AddBookResponse AddBook(AddBookRequest bookRequest)
+        public async Task <AddBookResponse> AddBook(AddBookRequest bookRequest)
         {
-            var auth = _bookRepository.GetBookByName(bookRequest.Title);
+            var auth = await _bookRepository.GetBookByName(bookRequest.Title);
 
             if (auth != null)
                 return new AddBookResponse()
@@ -42,7 +46,7 @@ namespace Bookstore.BL.Services
                 };
 
             var book = _mapper.Map<Book>(bookRequest);
-            var result = _bookRepository.AddBook(book);
+            var result = await _bookRepository.AddBook(book);
 
             return new AddBookResponse()
             {
@@ -51,22 +55,22 @@ namespace Bookstore.BL.Services
             };
         }
 
-        public Book DeleteBook(int bookId)
+        public async Task <Book> DeleteBook(int bookId)
         {
-            return _bookRepository.DeleteBook(bookId);
+            return await _bookRepository.DeleteBook(bookId);
         }
         
-        public Book? GetById(int id)
+        public async Task <Book?> GetById(int id)
         {
-            return _bookRepository.GetById(id);
+            return await _bookRepository.GetById(id);
         }
 
-        public Guid GetGuidId()
+        public async Task<Book> GetBookByName(string name)
         {
-            return Guid.NewGuid();
+            return await _bookRepository.GetBookByName(name);
         }
 
-        public UpdateBookResponse UpdateBook(UpdateBookRequest bookRequest)
+        public async Task <UpdateBookResponse> UpdateBook(UpdateBookRequest bookRequest)
         {
             var auth = _bookRepository.GetBookByName(bookRequest.Title);
 
@@ -78,13 +82,18 @@ namespace Bookstore.BL.Services
                 };
 
             var book = _mapper.Map<Book>(bookRequest);
-            var result = _bookRepository.UpdateBook(book);
+            var result = await _bookRepository.UpdateBook(book);
 
             return new UpdateBookResponse()
             {
                 HttpStatusCode = HttpStatusCode.OK,
                 Title = result
             };
+        }
+
+        public async Task<bool> AddMultipleBooks(IEnumerable<Book> bookCollection)
+        {
+            return await _bookRepository.AddMultipleBooks(bookCollection);
         }
     }
 }
