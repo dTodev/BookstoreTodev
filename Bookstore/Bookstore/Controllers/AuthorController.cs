@@ -96,10 +96,23 @@ namespace Bookstore.Controllers
             return Ok(result);
         }
 
+        //[HttpPost(nameof(DeleteAuthor))]
+        //public async Task<UpdateAuthorResponse> DeleteAuthor(int Id)
+        //{
+        //    return await _authorService.DeleteAuthor(Id);
+        //}
+
         [HttpPost(nameof(DeleteAuthor))]
-        public async Task<UpdateAuthorResponse> DeleteAuthor(int Id)
+        public async Task<IActionResult> DeleteAuthor(int Id)
         {
-            return await _authorService.DeleteAuthor(Id);
+            var result = await _authorService.DeleteAuthor(Id);
+
+            if (result.HttpStatusCode == HttpStatusCode.NotFound)
+                return NotFound(result);
+
+            if (result.HttpStatusCode == HttpStatusCode.BadRequest)
+                return BadRequest(result);
+            return Ok(result);
         }
     }
 }

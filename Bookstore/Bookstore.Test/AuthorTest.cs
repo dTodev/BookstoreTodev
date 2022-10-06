@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Moq;
 
 namespace Bookstore.Test
@@ -130,7 +131,7 @@ namespace Bookstore.Test
         }
 
         [Fact]
-        public async Task AddAuthorOk()
+        public async Task Author_AddAuthor_Ok()
         {
             //Setup
             var authorRequest = new AddAuthorRequest()
@@ -199,6 +200,127 @@ namespace Bookstore.Test
             var resultValue = badRequestObjectResult.Value as AddAuthorResponse;
             Assert.NotNull(resultValue);
             Assert.Equal("Author already exist", resultValue.Message);
+        }
+
+        [Fact]
+        public async Task Author_UpdateAuthorOk()
+        {
+            //Setup
+            var authorRequest = new UpdateAuthorRequest()
+            {
+                Id = 1,
+                Name = "New Name",
+                Age = 22,
+                DateOfBirth = DateTime.Now,
+                NickName = "NickName"
+            };
+            
+            _authorRepositoryMock.Setup(x => x.GetAuthorByName(authorRequest.Name))!.ReturnsAsync(_authors.FirstOrDefault(x => x.Id == authorRequest.Id));
+            _authorRepositoryMock.Setup(x => x.UpdateAuthor(It.IsAny<Author>())).Callback(() =>
+            {
+                var author = _authors.FirstOrDefault(x => x.Id == authorRequest.Id);
+                author.Name = authorRequest.Name;
+            })!.ReturnsAsync(() => _authors.FirstOrDefault(x => x.Id == authorRequest.Id));
+
+            //Inject
+            var service = new AuthorService(_authorRepositoryMock.Object, _bookRepositoryMock.Object, _mapper, _loggerMock.Object);
+            var controller = new AuthorController(_loggerAuthorControllerMock.Object, service, _mapper);
+
+            //Act
+            var result = await controller.UpdateAuthor(authorRequest);
+
+            //Assert
+            var okObjectResult = result as OkObjectResult;
+            Assert.NotNull(okObjectResult);
+
+            var resultValue = okObjectResult.Value as UpdateAuthorResponse;
+            Assert.NotNull(resultValue);
+            Assert.Equal(resultValue.Author.Name, _authors.FirstOrDefault(x => x.Id == authorRequest.Id).Name);
+        }
+
+        [Fact]
+        public async Task Author_UpdateAuthor_NotFound()
+        {
+            //Setup
+            var authorRequest = new UpdateAuthorRequest()
+            {
+                Id = 1,
+                Name = "TEST",
+                Age = 22,
+                DateOfBirth = DateTime.Now,
+                NickName = "NickName"
+            };
+
+            _authorRepositoryMock.Setup(x => x.GetAuthorByName(authorRequest.Name))!.ReturnsAsync(_authors.FirstOrDefault(x => x.Name == authorRequest.Name));
+
+            //Inject
+            var service = new AuthorService(_authorRepositoryMock.Object, _bookRepositoryMock.Object, _mapper, _loggerMock.Object);
+            var controller = new AuthorController(_loggerAuthorControllerMock.Object, service, _mapper);
+
+            //Act
+            var result = await controller.UpdateAuthor(authorRequest);
+
+            //Assert
+            var badRequestObjectResult = result as BadRequestObjectResult;
+            Assert.NotNull(badRequestObjectResult);
+
+            var resultValue = badRequestObjectResult.Value as UpdateAuthorResponse;
+            Assert.NotNull(resultValue);
+            Assert.Equal("Author does not exist so it can't be updated", resultValue.Message);
+        }
+
+        [Fact]
+        public async Task Author_DeleteAuthor_Ok()
+        {
+            //Setup
+            var authorId = 1;
+            var expectedAuthorsCount = 1;
+            var deletedAuthor = _authors.FirstOrDefault(x => x.Id == authorId);
+
+            _authorRepositoryMock.Setup(x => x.GetById(authorId)).ReturnsAsync(_authors.FirstOrDefault(x => x.Id == authorId));
+            _authorRepositoryMock.Setup(x => x.DeleteAuthor(authorId)).Callback(() =>
+            {
+                _authors.Remove(deletedAuthor);
+            })!.ReturnsAsync(deletedAuthor);
+
+            //Inject
+            var service = new AuthorService(_authorRepositoryMock.Object, _bookRepositoryMock.Object, _mapper, _loggerMock.Object);
+            var controller = new AuthorController(_loggerAuthorControllerMock.Object, service, _mapper);
+
+            //Act
+            var result = await controller.DeleteAuthor(authorId);
+
+            //Assert
+            var okObjectResult = result as OkObjectResult;
+            Assert.NotNull(okObjectResult);
+
+            var resultValue = okObjectResult.Value as UpdateAuthorResponse;
+            Assert.NotNull(resultValue);
+            Assert.Equal(expectedAuthorsCount, _authors.Count);
+        }
+
+        [Fact]
+        public async Task Author_DeleteAuthor_NotFound()
+        {
+            //Setup
+            var authorId = 3;
+
+            _authorRepositoryMock.Setup(x => x.GetById(authorId)).ReturnsAsync(_authors.FirstOrDefault(x => x.Id == authorId));
+
+            //Inject
+            var service = new AuthorService(_authorRepositoryMock.Object, _bookRepositoryMock.Object, _mapper, _loggerMock.Object);
+            var controller = new AuthorController(_loggerAuthorControllerMock.Object, service, _mapper);
+
+            //Act
+            var result = await controller.DeleteAuthor(authorId);
+
+            //Assert
+            var notFoundObjectResult = result as NotFoundObjectResult;
+            Assert.NotNull(notFoundObjectResult);
+
+            var resultValue = notFoundObjectResult.Value as UpdateAuthorResponse;
+            Assert.NotNull(resultValue);
+            Assert.Equal("Author does not exist, delete is impossible.", resultValue.Message);
         }
     }
 }
