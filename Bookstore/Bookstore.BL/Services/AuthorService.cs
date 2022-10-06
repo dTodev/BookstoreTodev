@@ -66,6 +66,15 @@ namespace Bookstore.BL.Services
 
         public async Task <UpdateAuthorResponse> DeleteAuthor(int authorId)
         {
+            var authorExists = await _authorRepository.GetById(authorId);
+
+            if (authorExists == null)
+                return new UpdateAuthorResponse
+                {
+                    HttpStatusCode = HttpStatusCode.NotFound,
+                    Message = "Author does not exist, delete is impossible."
+                };
+
             var authorHasBooks = await _bookRepository.GetByAuthorId(authorId);
 
             if (authorHasBooks != null)
@@ -96,7 +105,7 @@ namespace Bookstore.BL.Services
 
         public async Task <UpdateAuthorResponse> UpdateAuthor(UpdateAuthorRequest authorRequest)
         {
-            var auth = _authorRepository.GetAuthorByName(authorRequest.Name);
+            var auth = await _authorRepository.GetAuthorByName(authorRequest.Name);
 
             if (auth == null)
                 return new UpdateAuthorResponse()
@@ -111,7 +120,7 @@ namespace Bookstore.BL.Services
             return new UpdateAuthorResponse()
             {
                 HttpStatusCode = HttpStatusCode.OK,
-                Name = result
+                Author = result
             };
         }
 

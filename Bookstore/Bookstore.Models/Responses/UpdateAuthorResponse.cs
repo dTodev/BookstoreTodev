@@ -9,6 +9,6 @@ namespace Bookstore.Models.Responses
 {
     public class UpdateAuthorResponse : BaseResponse
     {
-        public Author Name { get; set; }
+        public Author Author { get; set; }
     }
 }
