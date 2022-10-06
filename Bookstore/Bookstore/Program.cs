@@ -1,3 +1,4 @@
+using Bookstore.BL.CommandHandlers;
 using Bookstore.BL.Interfaces;
 using Bookstore.BL.Services;
 using Bookstore.DL.Interfaces;
@@ -5,8 +6,10 @@ using Bookstore.DL.Repositories.InMemoryRepositories;
 using Bookstore.Extensions;
 using Bookstore.HealthChecks;
 using Bookstore.Models;
+using Bookstore.Models.MediatR.Commands;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using MediatR;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 
@@ -38,6 +41,9 @@ builder.Services.AddHealthChecks()
     .AddCheck<SqlHealthCheck>("SQL Server")
     .AddCheck<MyCustomHealthCheck>("Custom Health Check")
     .AddUrlGroup(new Uri("https://google.bg"), name: "Google Service");
+
+// Add MediatR
+builder.Services.AddMediatR(typeof(GetAllBooksCommandHandler).Assembly);
 
 var app = builder.Build();
 
