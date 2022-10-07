@@ -4,8 +4,10 @@ using Bookstore.BL.Interfaces;
 using Bookstore.BL.Services;
 using Bookstore.DL.Interfaces;
 using Bookstore.DL.Repositories.InMemoryRepositories;
+using Bookstore.Models.MediatR.Commands;
 using Bookstore.Models.Models;
 using Bookstore.Models.Requests;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bookstore.Controllers
@@ -14,34 +16,38 @@ namespace Bookstore.Controllers
     [Route("[controller]")]
     public class BookController : ControllerBase
     {
-        private readonly IBookService _bookService;
         private readonly ILogger<BookController> _logger;
         private readonly IMapper _mapper;
+        private readonly IMediator _mediator;
 
-        public BookController(ILogger<BookController> logger, IBookService bookService, IMapper mapper)
+        public BookController(ILogger<BookController> logger, IMapper mapper, IMediator mediator)
         {
             _logger = logger;
-            _bookService = bookService;
             _mapper = mapper;
+            _mediator = mediator;
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet(nameof(GetAllBooks))]
         public async Task <IActionResult> GetAllBooks()
         {
-            return Ok(await _bookService.GetAllBooks());
+            return Ok(await _mediator.Send(new GetAllBooksCommand()));
         }
 
         [HttpGet(nameof(GetById))]
         public async Task <Book> GetById(int id)
         {
-            return await _bookService.GetById(id);
+            var result = await _mediator.Send(new GetBookByIdCommand(id));
+
+            return result;
         }
 
         [HttpGet(nameof(GetBookByName))]
         public async Task<Book> GetBookByName(string name)
         {
-            return await _bookService.GetBookByName(name);
+            var result = await _mediator.Send(new GetBookByNameCommand(name));
+
+            return result;
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -49,7 +55,7 @@ namespace Bookstore.Controllers
         [HttpPost(nameof(AddBook))]
         public async Task <IActionResult> AddBook([FromBody] AddBookRequest bookRequest)
         {
-            var result = await _bookService.AddBook(bookRequest);
+            var result = await _mediator.Send(new AddBookCommand(bookRequest));
 
             if (result.HttpStatusCode == HttpStatusCode.BadRequest)
                 return BadRequest(result);
@@ -67,7 +73,7 @@ namespace Bookstore.Controllers
 
             var bookCollection = _mapper.Map<IEnumerable<Book>>(addMultipleBooksRequests.BookRequests);
 
-            var result = await _bookService.AddMultipleBooks(bookCollection);
+            var result = await _mediator.Send(new AddMultipleBooksCommand(bookCollection));
 
             if (!result) return BadRequest(result);
 
@@ -79,7 +85,7 @@ namespace Bookstore.Controllers
         [HttpPost(nameof(UpdateBook))]
         public async Task <IActionResult> UpdateBook([FromBody] UpdateBookRequest bookRequest)
         {
-            var result = await _bookService.UpdateBook(bookRequest);
+            var result = await _mediator.Send(new UpdateBookCommand(bookRequest));
 
             if (result.HttpStatusCode == HttpStatusCode.BadRequest)
                 return BadRequest(result);
@@ -89,7 +95,9 @@ namespace Bookstore.Controllers
         [HttpPost(nameof(DeleteBook))]
         public async Task<Book> DeleteBook(int Id)
         {
-            return await _bookService.DeleteBook(Id);
+            var result = await _mediator.Send(new DeleteBookCommand(Id));
+
+            return result;
         }
     }
 }
