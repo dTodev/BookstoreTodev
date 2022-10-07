@@ -17,7 +17,6 @@ namespace Bookstore.BL.CommandHandlers
 {
     public class AddBookCommandHandler : IRequestHandler<AddBookCommand, AddBookResponse>
     {
-        //private readonly IBookService _bookService;
         private readonly IBookRepository _bookRepository;
         private readonly IAuthorRepository _authorRepository;
         private readonly IMapper _mapper;
@@ -31,7 +30,6 @@ namespace Bookstore.BL.CommandHandlers
 
         public async Task<AddBookResponse> Handle(AddBookCommand request, CancellationToken cancellationToken)
         {
-            //return await _bookService.AddBook(request.book);
             var auth = await _bookRepository.GetBookByName(request._book.Title);
             var authorExists = await _authorRepository.GetById(request._book.AuthorId);
 
