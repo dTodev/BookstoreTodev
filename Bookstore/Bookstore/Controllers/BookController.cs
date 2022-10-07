@@ -16,15 +16,13 @@ namespace Bookstore.Controllers
     [Route("[controller]")]
     public class BookController : ControllerBase
     {
-        private readonly IBookService _bookService;
         private readonly ILogger<BookController> _logger;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
 
-        public BookController(ILogger<BookController> logger, IBookService bookService, IMapper mapper, IMediator mediator)
+        public BookController(ILogger<BookController> logger, IMapper mapper, IMediator mediator)
         {
             _logger = logger;
-            _bookService = bookService;
             _mapper = mapper;
             _mediator = mediator;
         }
@@ -75,7 +73,6 @@ namespace Bookstore.Controllers
 
             var bookCollection = _mapper.Map<IEnumerable<Book>>(addMultipleBooksRequests.BookRequests);
 
-            //var result = await _bookService.AddMultipleBooks(bookCollection);
             var result = await _mediator.Send(new AddMultipleBooksCommand(bookCollection));
 
             if (!result) return BadRequest(result);

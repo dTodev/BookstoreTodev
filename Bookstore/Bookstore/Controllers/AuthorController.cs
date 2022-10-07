@@ -4,9 +4,11 @@ using Bookstore.BL.Interfaces;
 using Bookstore.BL.Services;
 using Bookstore.DL.Interfaces;
 using Bookstore.DL.Repositories.InMemoryRepositories;
+using Bookstore.Models.MediatR.Commands;
 using Bookstore.Models.Models;
 using Bookstore.Models.Requests;
 using Bookstore.Models.Responses;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bookstore.Controllers
@@ -15,22 +17,22 @@ namespace Bookstore.Controllers
     [Route("[controller]")]
     public class AuthorController : ControllerBase
     {
-        private readonly IAuthorService _authorService;
         private readonly ILogger<AuthorController> _logger;
         private readonly IMapper _mapper;
+        private readonly IMediator _mediator;
 
-        public AuthorController(ILogger<AuthorController> logger, IAuthorService authorService, IMapper mapper)
+        public AuthorController(ILogger<AuthorController> logger, IMapper mapper, IMediator mediator)
         {
             _logger = logger;
-            _authorService = authorService;
-            _mapper = mapper;   
+            _mapper = mapper;
+            _mediator = mediator;
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet(nameof(GetAllAuthors))]
         public async Task<IActionResult> GetAllAuthors()
         {
-            return Ok(await _authorService.GetAllAuthors());
+            return Ok(await _mediator.Send(new GetAllAuthorsCommand()));
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -38,20 +40,22 @@ namespace Bookstore.Controllers
         [HttpGet(nameof(GetById))]
         public async Task<IActionResult> GetById(int id)
         {
-            var result = await _authorService.GetById(id);
+            var result = await _mediator.Send(new GetAuthorByIdCommand(id));
 
-            if(result == null)
+            if (result == null)
             {
                 return NotFound();
             }
 
-            return Ok(await _authorService.GetById(id));
+            return Ok(result);
         }
 
         [HttpGet(nameof(GetAuthorByName))]
         public async Task<Author> GetAuthorByName(string name)
         {
-            return await _authorService.GetAuthorByName(name);
+            var result = await _mediator.Send(new GetAuthorByNameCommand(name));
+
+            return result;
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -59,7 +63,7 @@ namespace Bookstore.Controllers
         [HttpPost(nameof(AddAuthor))]
         public async Task<IActionResult> AddAuthor([FromBody] AddAuthorRequest authorRequest)
         {
-            var result = await _authorService.AddAuthor(authorRequest);
+            var result = await _mediator.Send(new AddAuthorCommand(authorRequest));
 
             if (result.HttpStatusCode == HttpStatusCode.BadRequest)
                 return BadRequest(result);
@@ -77,9 +81,9 @@ namespace Bookstore.Controllers
 
             var authorCollection = _mapper.Map<IEnumerable<Author>>(addMultipleAuthorRequests.AuthorRequests);
 
-            var result = await _authorService.AddMultipleAuthors(authorCollection);
+            var result = await _mediator.Send(new AddMultipleAuthorsCommand(authorCollection));
 
-            if(!result) return BadRequest(result);
+            if (!result) return BadRequest(result);
 
             return Ok(result);
         }
@@ -89,23 +93,17 @@ namespace Bookstore.Controllers
         [HttpPost(nameof(UpdateAuthor))]
         public async Task <IActionResult> UpdateAuthor([FromBody] UpdateAuthorRequest authorRequest)
         {
-            var result = await _authorService.UpdateAuthor(authorRequest);
+            var result = await _mediator.Send(new UpdateAuthorCommand(authorRequest));
 
             if (result.HttpStatusCode == HttpStatusCode.BadRequest)
                 return BadRequest(result);
             return Ok(result);
         }
 
-        //[HttpPost(nameof(DeleteAuthor))]
-        //public async Task<UpdateAuthorResponse> DeleteAuthor(int Id)
-        //{
-        //    return await _authorService.DeleteAuthor(Id);
-        //}
-
         [HttpPost(nameof(DeleteAuthor))]
         public async Task<IActionResult> DeleteAuthor(int Id)
         {
-            var result = await _authorService.DeleteAuthor(Id);
+            var result = await _mediator.Send(new DeleteAuthorCommand(Id));
 
             if (result.HttpStatusCode == HttpStatusCode.NotFound)
                 return NotFound(result);
