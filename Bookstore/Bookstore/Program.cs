@@ -1,4 +1,5 @@
 using System.Text;
+using Bookstore.BL.BackgroundServices;
 using Bookstore.BL.CommandHandlers;
 using Bookstore.BL.Interfaces;
 using Bookstore.BL.Services;
@@ -100,6 +101,9 @@ builder.Services.AddMediatR(typeof(GetAllBooksCommandHandler).Assembly);
 
 builder.Services.AddIdentity<UserInfo, UserRole>().AddUserStore<UserInfoStore>().AddRoleStore<UserRoleStore>();
 
+builder.Services.AddHostedService<MyBackgroundService>();
+
+// App Builder below
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
