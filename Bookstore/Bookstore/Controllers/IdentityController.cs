@@ -3,6 +3,8 @@ using System.Security.Claims;
 using System.Text;
 using Bookstore.BL.Interfaces;
 using Bookstore.Models.Models.Users;
+using Bookstore.Models.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
@@ -12,36 +14,60 @@ namespace Bookstore.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class TokenController : ControllerBase
+    public class IdentityController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private readonly IUserInfoService _userInfoService;
+        private readonly IIdentityService _identityService;
 
-        public TokenController(IConfiguration configuration, IUserInfoService userInfoService)
+        public IdentityController(IConfiguration configuration, IIdentityService identityService)
         {
             _configuration = configuration;
-            _userInfoService = userInfoService;
+            _identityService = identityService;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Post(UserInfo userData)
+        [AllowAnonymous]
+        [HttpPost(nameof(RegisterUser))]
+        public async Task<IActionResult> RegisterUser([FromBody] UserInfo user)
         {
-            if (userData != null && !string.IsNullOrEmpty(userData.Email) && !string.IsNullOrWhiteSpace(userData.Password))
+            if (string.IsNullOrEmpty(user.UserName) || string.IsNullOrWhiteSpace(user.Password))
             {
-                var user = await _userInfoService.GetUserInfoAsync(userData.Email, userData.Password);
+                return BadRequest($"Username or password is missing!");
+            }
+
+            var result = await _identityService.CreateAsync(user);
+
+            return result.Succeeded ? Ok(result) : BadRequest(result);
+        }
+
+        [AllowAnonymous]
+        [HttpPost(nameof(Login))]
+        public async Task<IActionResult> Login(LoginRequest loginRequest)
+        {
+            if (loginRequest != null && !string.IsNullOrEmpty(loginRequest.UserName) && !string.IsNullOrWhiteSpace(loginRequest.Password))
+            {
+                var user = await _identityService.CheckUserAndPass(loginRequest.UserName, loginRequest.Password);
 
                 if(user != null)
                 {
-                    var claims = new[]
+                    var userRoles = await _identityService.GetUserRoles(user);
+
+                    var claims = new List<Claim>
                     {
                         new Claim(JwtRegisteredClaimNames.Sub, _configuration.GetSection("Jwt:Subject").Value),
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToString()),
                         new Claim("UserId", user.UserId.ToString()),
                         new Claim("DisplayName", user.DisplayName ?? string.Empty),
-                        new Claim("UseryName", user.UserName ?? string.Empty),
-                        new Claim("Email", user.Email ?? string.Empty)
+                        new Claim("UserName", user.UserName ?? string.Empty),
+                        new Claim("Email", user.Email ?? string.Empty),
+                        new Claim("View", "View"),
+                        new Claim("Test", "Test")
                     };
+
+                    foreach(var role in userRoles)
+                    {
+                        claims.Add(new Claim(ClaimTypes.Role, role));
+                    }
 
                     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
 

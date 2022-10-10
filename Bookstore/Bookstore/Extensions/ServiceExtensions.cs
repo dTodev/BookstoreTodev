@@ -25,6 +25,7 @@ namespace Bookstore.Extensions
             services.AddSingleton<IPersonService, PersonService>();
             services.AddSingleton<IEmployeeService, EmployeeService>();
             services.AddSingleton<IUserInfoService, EmployeeService>();
+            services.AddTransient<IIdentityService, IdentityService>();
             //services.AddSingleton<IBookService, BookService>();
             //services.AddSingleton<IAuthorService, AuthorService>();
 

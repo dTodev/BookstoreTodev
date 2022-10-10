@@ -4,11 +4,13 @@ using Bookstore.BL.Interfaces;
 using Bookstore.BL.Services;
 using Bookstore.DL.Interfaces;
 using Bookstore.DL.Repositories.InMemoryRepositories;
+using Bookstore.DL.Repositories.MsSql;
 using Bookstore.Extensions;
 using Bookstore.HealthChecks;
 using Bookstore.Middleware;
 using Bookstore.Models;
 using Bookstore.Models.MediatR.Commands;
+using Bookstore.Models.Models.Users;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
@@ -64,6 +66,15 @@ builder.Services.AddSwaggerGen(x =>
     }); 
 });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("View", policy =>
+    {
+        policy.RequireClaim("View");
+        policy.RequireClaim("Test");
+    });
+});
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     options.RequireHttpsMetadata = false;
@@ -86,6 +97,8 @@ builder.Services.AddHealthChecks()
 
 // Add MediatR
 builder.Services.AddMediatR(typeof(GetAllBooksCommandHandler).Assembly);
+
+builder.Services.AddIdentity<UserInfo, UserRole>().AddUserStore<UserInfoStore>().AddRoleStore<UserRoleStore>();
 
 var app = builder.Build();
 
