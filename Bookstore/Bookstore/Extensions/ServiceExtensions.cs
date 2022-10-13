@@ -4,6 +4,7 @@ using Bookstore.DL.Interfaces;
 using Bookstore.DL.Repositories.InMemoryRepositories;
 using Bookstore.DL.Repositories.MsSql;
 using Bookstore.Models;
+using Bookstore.Models.Models.Users;
 
 namespace Bookstore.Extensions
 {
@@ -26,6 +27,8 @@ namespace Bookstore.Extensions
             services.AddSingleton<IEmployeeService, EmployeeService>();
             services.AddSingleton<IUserInfoService, EmployeeService>();
             services.AddTransient<IIdentityService, IdentityService>();
+            services.AddSingleton<KafkaProducerService<int, Person2>>();
+            services.AddHostedService<KafkaConsumerBGService<int, Person2>>();
             //services.AddSingleton<IBookService, BookService>();
             //services.AddSingleton<IAuthorService, AuthorService>();
 

@@ -10,6 +10,7 @@ using Bookstore.HealthChecks;
 using Bookstore.Middleware;
 using Bookstore.Models;
 using Bookstore.Models.MediatR.Commands;
+using Bookstore.Models.Models.Configurations;
 using Bookstore.Models.Models.Users;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -28,6 +29,9 @@ var logger = new LoggerConfiguration()
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.AddSerilog(logger);
+
+builder.Services.Configure<MyJsonSettings>(builder.Configuration.GetSection(nameof(MyJsonSettings)));
+builder.Services.Configure<KafkaSettings>(builder.Configuration.GetSection(nameof(KafkaSettings)));
 
 // Add services to the container.
 builder.Services.RegisterRepositories();
