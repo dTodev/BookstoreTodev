@@ -16,6 +16,7 @@ namespace Bookstore.BL.Services
     {
         private readonly IOptionsMonitor<KafkaSettings> _kafkaSettings;
         private readonly IConsumer<TKey, TValue> _consumer;
+        public readonly Dictionary<TKey, TValue> _dictionary;
 
         public KafkaConsumerBGService(IOptionsMonitor<KafkaSettings> kafkaSettings)
         {
@@ -31,6 +32,8 @@ namespace Bookstore.BL.Services
             _consumer = new ConsumerBuilder<TKey, TValue>(config).SetKeyDeserializer(new MsgPackDeserializer<TKey>()).SetValueDeserializer(new MsgPackDeserializer<TValue>()).Build();
 
             _consumer.Subscribe("test2");
+
+            _dictionary = new Dictionary<TKey, TValue>();
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -41,10 +44,11 @@ namespace Bookstore.BL.Services
                 {
                     var receivedMessage = _consumer.Consume();
 
+                    _dictionary.Add(receivedMessage.Message.Key, receivedMessage.Message.Value);
+
                     Console.WriteLine($"Received msg with key: {receivedMessage.Key} value: {receivedMessage.Value}");
                 }
             });
-
             return Task.CompletedTask;
         }
     }

@@ -28,6 +28,7 @@ namespace Bookstore.Extensions
             services.AddSingleton<IUserInfoService, EmployeeService>();
             services.AddTransient<IIdentityService, IdentityService>();
             services.AddSingleton<KafkaProducerService<int, Person2>>();
+            services.AddHostedService<KafkaConsumerBGService<int, Person2>>();
             //services.AddSingleton<IBookService, BookService>();
             //services.AddSingleton<IAuthorService, AuthorService>();
 

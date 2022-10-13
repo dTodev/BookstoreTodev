@@ -28,6 +28,5 @@ namespace Bookstore.Controllers
             await _kafkaProducerService.ProduceMessage(key, person);
             return Ok();
         }
-
     }
 }
