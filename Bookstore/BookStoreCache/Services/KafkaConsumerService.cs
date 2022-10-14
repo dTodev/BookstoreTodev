@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Bookstore.BL.SerializerAndDeserializer;
+using Bookstore.Cache.SerializerAndDeserializer;
 using Bookstore.Models.Models.Configurations;
 using Confluent.Kafka;
 using Microsoft.Extensions.Hosting;

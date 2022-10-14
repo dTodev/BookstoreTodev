@@ -50,8 +50,6 @@ namespace Bookstore.BL.Services
                     var receivedMessage = _consumer.Consume();
 
                     _dictionary.Add(receivedMessage.Message.Key, receivedMessage.Message.Value);
-
-                    Console.WriteLine($"Received msg with key: {receivedMessage.Key} value: {receivedMessage.Value}");
                 }
 
                 Dispose();
