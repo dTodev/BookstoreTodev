@@ -12,7 +12,7 @@ using Microsoft.Extensions.Options;
 
 namespace Bookstore.BL.Services
 {
-    public class KafkaConsumerBGService<TKey, TValue> : BackgroundService
+    public class KafkaConsumerBGService<TKey, TValue> : BackgroundService, IDisposable
     {
         private readonly IOptionsMonitor<KafkaSettings> _kafkaSettings;
         private readonly IConsumer<TKey, TValue> _consumer;
@@ -36,6 +36,11 @@ namespace Bookstore.BL.Services
             _dictionary = new Dictionary<TKey, TValue>();
         }
 
+        void Dispose()
+        {
+            _consumer.Dispose();
+        }
+
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             Task.Run(() =>
@@ -45,9 +50,9 @@ namespace Bookstore.BL.Services
                     var receivedMessage = _consumer.Consume();
 
                     _dictionary.Add(receivedMessage.Message.Key, receivedMessage.Message.Value);
-
-                    Console.WriteLine($"Received msg with key: {receivedMessage.Key} value: {receivedMessage.Value}");
                 }
+
+                Dispose();
             });
             return Task.CompletedTask;
         }
