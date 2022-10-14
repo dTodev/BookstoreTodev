@@ -1,10 +1,14 @@
 ﻿using Bookstore.BL.Interfaces;
 using Bookstore.BL.Services;
+using Bookstore.Cache.Models;
+using Bookstore.Cache.Services;
 using Bookstore.DL.Interfaces;
 using Bookstore.DL.Repositories.InMemoryRepositories;
 using Bookstore.DL.Repositories.MsSql;
 using Bookstore.Models;
 using Bookstore.Models.Models.Users;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Newtonsoft.Json.Linq;
 
 namespace Bookstore.Extensions
 {
@@ -29,6 +33,7 @@ namespace Bookstore.Extensions
             services.AddTransient<IIdentityService, IdentityService>();
             services.AddSingleton<KafkaProducerService<int, Person2>>();
             services.AddHostedService<KafkaConsumerBGService<int, Person2>>();
+            services.AddHostedService<KafkaConsumerService<int, BookInfo>>();
             //services.AddSingleton<IBookService, BookService>();
             //services.AddSingleton<IAuthorService, AuthorService>();
 
