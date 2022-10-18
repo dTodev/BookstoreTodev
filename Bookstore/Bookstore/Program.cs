@@ -32,6 +32,7 @@ builder.Logging.AddSerilog(logger);
 
 builder.Services.Configure<MyJsonSettings>(builder.Configuration.GetSection(nameof(MyJsonSettings)));
 builder.Services.Configure<KafkaSettings>(builder.Configuration.GetSection(nameof(KafkaSettings)));
+builder.Services.Configure<MongoDbConfiguration>(builder.Configuration.GetSection(nameof(MongoDbConfiguration)));
 
 // Add services to the container.
 builder.Services.RegisterRepositories();
