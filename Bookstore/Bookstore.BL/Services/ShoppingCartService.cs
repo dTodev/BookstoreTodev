@@ -91,8 +91,6 @@ namespace Bookstore.BL.Services
 
             _shoppingCartRepository.SaveCurrentCartContentToDB(cartForSaving);
 
-            Console.WriteLine(cartForSaving.Id);
-
             return Task.CompletedTask;
         }
 

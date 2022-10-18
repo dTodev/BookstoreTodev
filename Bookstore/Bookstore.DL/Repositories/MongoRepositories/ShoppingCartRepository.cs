@@ -26,7 +26,7 @@ namespace Bookstore.DL.Repositories.MongoRepositories
 
         public Task SaveCurrentCartContentToDB(ShoppingCart cartForSaving)
         {
-            _databaseCollection.InsertOne(cartForSaving);
+            _databaseCollection.InsertOneAsync(cartForSaving);
             return Task.CompletedTask;
         }
 
